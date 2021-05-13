@@ -1,0 +1,153 @@
+specVersion: 0.0.2
+description: The Graph protocol subgraph for GEB
+repository: https://github.com/reflexer-labs/geb-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - name: Coin
+    kind: ethereum/contract
+    network: {{NETWORK}}
+    source:
+      abi: Coin
+      address: '{{GEB_COIN}}'
+      startBlock: {{STARTING_BLOCK_NUMBER}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/modules/token/coin.ts
+      entities:
+        - ERC20Balance
+        - ERC20Transfer
+        - ERC20Allowance
+      abis:
+        - name: Coin
+          file: ./abis/Coin.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer 
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval 
+        - event: AddAuthorization(address)
+          handler: handleAddAuthorization
+        - event: RemoveAuthorization(address)
+          handler: handleRemoveAuthorization
+  
+  - name: ProtToken 
+    kind: ethereum/contract
+    network: {{NETWORK}}
+    source:
+      abi: DSToken
+      address: '{{GEB_PROT}}'
+      startBlock: {{STARTING_BLOCK_NUMBER}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/modules/token/prot-token.ts
+      entities:
+        - ERC20Balance
+      abis:
+        - name: DSToken
+          file: ./abis/DSToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+  
+  - name: UniCoinPool 
+    kind: ethereum/contract
+    network: {{NETWORK}}
+    source:
+      abi: UniswapV2Pair
+      address: '{{GEB_COIN_UNISWAP_POOL}}'
+      startBlock: {{STARTING_BLOCK_NUMBER}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/modules/uniswap/uniswap.ts
+      entities:
+        - UniswapV2Pair
+      abis:
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        # - event: Mint(indexed address,uint256,uint256)
+        #   handler: handleMint
+        # - event: Burn(indexed address,uint256,uint256,indexed address)
+        #   handler: handleBurn
+
+
+    kind: ethereum/contract
+    network: {{NETWORK}}
+    source:
+      abi: StakingRewardsFactory
+      address: '{{GEB_INCENTIVES_MINER}}'
+      startBlock: {{STARTING_BLOCK_NUMBER}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/modules/incentive/incentive-factory.ts
+      entities:
+        - IncentiveBalance
+        - IncentiveCampaign
+      abis:
+        - name: StakingRewardsFactory
+          file: ./abis/StakingRewardsFactory.json
+      eventHandlers:
+        - event: Deploy(indexed address,indexed uint256,uint256,uint256)
+          handler: handleDeploy
+        - event: AddAuthorization(address)
+          handler: handleAddAuthorization
+        - event: RemoveAuthorization(address)
+          handler: handleRemoveAuthorization
+        # - event: ModifyParameters(indexed uint256,bytes32,uint256)
+        #   handler: handleModifyParameters
+        # - event: NotifyRewardAmount(indexed uint256,uint256)
+        #   handler: handleNotifyRewardAmount
+
+    kind: ethereum/contract
+    network: {{NETWORK}}
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/modules/incentive/incentive.ts
+      entities:
+        - IncentiveBalance
+        - IncentiveCampaign
+      abis:
+        - name: StakingRewards
+          file: ./abis/StakingRewards.json
+      eventHandlers:
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
