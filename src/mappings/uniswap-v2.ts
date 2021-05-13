@@ -8,6 +8,7 @@ import {
 } from '../../generated/UniCoinPool/UniswapV2Pair'
 import { ERC20Transfer, UniswapV2Swap, UniswapV2Sync } from '../../generated/schema'
 import {
+  getOrCreateERC20,
   getOrCreateERC20Balance,
   getOrCreateERC20BAllowance,
   updateAllowance,
@@ -40,6 +41,7 @@ export function handleSync(event: Sync): void {
   let sync = new UniswapV2Sync(eventUid(event))
   sync.reserve0 = decimal.fromWad(event.params.reserve0)
   sync.reserve1 = decimal.fromWad(event.params.reserve1)
+  sync.pair = event.address.toHexString()
   sync.createdAt = event.block.timestamp
   sync.createdAtBlock = event.block.number
   sync.createdAtTransaction = event.transaction.hash
@@ -65,6 +67,7 @@ export function handleSwap(event: Swap): void {
 export function handleTransfer(event: Transfer): void {
   let tokenAddress = event.address
 
+  let erc20 = getOrCreateERC20(tokenAddress)
   let source = event.params.from
   let destination = event.params.to
   let amount = decimal.fromWad(event.params.value)
@@ -85,6 +88,7 @@ export function handleTransfer(event: Transfer): void {
     destBalance.save()
   } else {
     // Burn
+    erc20.totalSupply = erc20.totalSupply.minus(amount)
   }
 
   // Check if it's not a mint before updating source
@@ -102,7 +106,10 @@ export function handleTransfer(event: Transfer): void {
     srcBalance.save()
   } else {
     // Mint
+    erc20.totalSupply = erc20.totalSupply.plus(amount)
   }
+
+  erc20.save()
 
   // Deduct the allowance
   // If this transfer is a transferFrom we need deduct the allowance by the amount of the transfer.

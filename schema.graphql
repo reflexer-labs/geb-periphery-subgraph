@@ -191,6 +191,9 @@ type UniswapV2Sync @entity {
   " Uniswap reserve of asset 1 "
   reserve1: BigDecimal!
 
+  " Uniswap pair "
+  pair: UniswapV2Pair!
+
   " Timestamp of the block at which the sync was made [unix time] "
   createdAt: BigInt!
 

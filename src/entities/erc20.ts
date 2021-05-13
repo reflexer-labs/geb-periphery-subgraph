@@ -10,6 +10,7 @@ export function getOrCreateERC20(tokenAddress: Address): ERC20 {
   if (!erc20) {
     erc20 = new ERC20(tokenAddress.toHexString())
     let contract = ERC20Contract.bind(tokenAddress)
+    erc20.address = tokenAddress
     erc20.name = contract.name()
     erc20.symbol = contract.symbol()
     erc20.decimals = interger.fromNumber(contract.decimals())
