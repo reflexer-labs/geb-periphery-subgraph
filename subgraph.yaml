@@ -98,3 +98,37 @@ dataSources:
         #   handler: handleMint
         # - event: Burn(indexed address,uint256,uint256,indexed address)
         #   handler: handleBurn
+
+  - name: UniDaiCoinPool 
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: UniswapV2Pair
+      address: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919'
+      startBlock: 11848304
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswap-v2.ts
+      entities:
+        - UniswapV2Pair
+      abis:
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+       
+        # - event: Mint(indexed address,uint256,uint256)
+        #   handler: handleMint
+        # - event: Burn(indexed address,uint256,uint256,indexed address)
+        #   handler: handleBurn
