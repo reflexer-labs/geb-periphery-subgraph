@@ -6,16 +6,16 @@ schema:
 dataSources:
   - name: Coin
     kind: ethereum/contract
-    network: {{NETWORK}}
+    network: mainnet
     source:
       abi: Coin
-      address: '{{GEB_COIN}}'
-      startBlock: {{STARTING_BLOCK_NUMBER}}
+      address: '0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919'
+      startBlock: 11848304
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/modules/token/coin.ts
+      file: ./src/mappings/coin.ts
       entities:
         - ERC20Balance
         - ERC20Transfer
@@ -30,23 +30,24 @@ dataSources:
           handler: handleTransfer 
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval 
-        - event: AddAuthorization(address)
-          handler: handleAddAuthorization
-        - event: RemoveAuthorization(address)
-          handler: handleRemoveAuthorization
+
+        # - event: AddAuthorization(address)
+        #   handler: handleAddAuthorization
+        # - event: RemoveAuthorization(address)
+        #   handler: handleRemoveAuthorization
   
   - name: ProtToken 
     kind: ethereum/contract
-    network: {{NETWORK}}
+    network: mainnet
     source:
       abi: DSToken
-      address: '{{GEB_PROT}}'
-      startBlock: {{STARTING_BLOCK_NUMBER}}
+      address: '0x6243d8CEA23066d098a15582d81a598b4e8391F4'
+      startBlock: 11848304
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/modules/token/prot-token.ts
+      file: ./src/mappings/prot-token.ts
       entities:
         - ERC20Balance
       abis:
@@ -66,16 +67,16 @@ dataSources:
   
   - name: UniCoinPool 
     kind: ethereum/contract
-    network: {{NETWORK}}
+    network: mainnet
     source:
       abi: UniswapV2Pair
-      address: '{{GEB_COIN_UNISWAP_POOL}}'
-      startBlock: {{STARTING_BLOCK_NUMBER}}
+      address: '0x8aE720a71622e824F576b4A8C03031066548A3B1'
+      startBlock: 11848304
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/modules/uniswap/uniswap.ts
+      file: ./src/mappings/uniswap-v2.ts
       entities:
         - UniswapV2Pair
       abis:
@@ -92,62 +93,8 @@ dataSources:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
+       
         # - event: Mint(indexed address,uint256,uint256)
         #   handler: handleMint
         # - event: Burn(indexed address,uint256,uint256,indexed address)
         #   handler: handleBurn
-
-
-    kind: ethereum/contract
-    network: {{NETWORK}}
-    source:
-      abi: StakingRewardsFactory
-      address: '{{GEB_INCENTIVES_MINER}}'
-      startBlock: {{STARTING_BLOCK_NUMBER}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      file: ./src/mappings/modules/incentive/incentive-factory.ts
-      entities:
-        - IncentiveBalance
-        - IncentiveCampaign
-      abis:
-        - name: StakingRewardsFactory
-          file: ./abis/StakingRewardsFactory.json
-      eventHandlers:
-        - event: Deploy(indexed address,indexed uint256,uint256,uint256)
-          handler: handleDeploy
-        - event: AddAuthorization(address)
-          handler: handleAddAuthorization
-        - event: RemoveAuthorization(address)
-          handler: handleRemoveAuthorization
-        # - event: ModifyParameters(indexed uint256,bytes32,uint256)
-        #   handler: handleModifyParameters
-        # - event: NotifyRewardAmount(indexed uint256,uint256)
-        #   handler: handleNotifyRewardAmount
-
-    kind: ethereum/contract
-    network: {{NETWORK}}
-    source:
-      abi: StakingRewards
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      file: ./src/mappings/modules/incentive/incentive.ts
-      entities:
-        - IncentiveBalance
-        - IncentiveCampaign
-      abis:
-        - name: StakingRewards
-          file: ./abis/StakingRewards.json
-      eventHandlers:
-        - event: RewardAdded(uint256)
-          handler: handleRewardAdded
-        - event: RewardPaid(indexed address,uint256)
-          handler: handleRewardPaid
-        - event: Staked(indexed address,uint256)
-          handler: handleStaked
-        - event: Withdrawn(indexed address,uint256)
-          handler: handleWithdrawn

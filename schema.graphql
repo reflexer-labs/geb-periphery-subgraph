@@ -1,4 +1,23 @@
 # --- ERC20 ---
+type ERC20 @entity {
+  "<token address>"
+  id: ID!
+
+  " Token address"
+  address: Bytes!
+
+  "Full name of the token"
+  name: String!
+
+  " Ticker nanme "
+  symbol: String!
+
+  " Total supply of the token in circulation "
+  totalSupply: BigDecimal!
+
+  " Number of decimal of the token "
+  decimals: BigInt!
+}
 
 type ERC20Balance @entity {
   "<tokenAddress>-<address>"
@@ -7,14 +26,8 @@ type ERC20Balance @entity {
   " Address of the ERC20 token "
   tokenAddress: Bytes!
 
-  " Static label such as COIN, GOV, COIN_UNI_POOL to identify the asset "
-  label: String
-
   " Address of the owner that has the balance "
   address: Bytes!
-
-  " Either the address or the owner of the proxy if the address is a Proxy "
-  owner: User
 
   " Balance amount "
   balance: BigDecimal!
@@ -35,9 +48,6 @@ type ERC20Balance @entity {
 type ERC20Transfer @entity {
   " Equal to: <tx hash>-<log index> "
   id: ID!
-
-  " Static label such as COIN, GOV, COIN_UNI_POOL to identify the asset "
-  label: String
 
   " Address of the ERC20 token "
   tokenAddress: Bytes!
@@ -68,9 +78,6 @@ type ERC20Allowance @entity {
   " Address of the ERC20 token "
   tokenAddress: Bytes!
 
-  " Static label such as COIN, GOV, COIN_UNI_POOL to identify the asset "
-  label: String
-
   " Account that allows others to spend "
   address: Bytes!
 
@@ -93,17 +100,14 @@ type ERC20Allowance @entity {
   modifiedAtTransaction: Bytes!
 }
 
-# --- Uniswap ---
+# --- Uniswap V2 ---
 
-type UniswapPair @entity {
+type UniswapV2Pair @entity {
   " Pair address "
   id: ID!
 
   " Contract address of the pair "
   address: Bytes!
-
-  " Pair name/label "
-  label: String
 
   " Base token address "
   token0: Bytes!
@@ -145,12 +149,12 @@ type UniswapPair @entity {
   modifiedAtTransaction: Bytes
 }
 
-type UniswapSwap @entity {
+type UniswapV2Swap @entity {
   "<Tx hash>-<Log index>"
   id: ID!
 
   " Uniswap pair "
-  pair: UniswapPair!
+  pair: UniswapV2Pair!
 
   " Address that made the swap "
   sender: Bytes!
@@ -177,7 +181,7 @@ type UniswapSwap @entity {
   createdAtTransaction: Bytes!
 }
 
-type UniswapSync @entity {
+type UniswapV2Sync @entity {
   " <Tx hash>-<Log index> "
   id: ID!
 

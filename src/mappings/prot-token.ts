@@ -1,16 +1,16 @@
 import { Address, Bytes, dataSource, log } from '@graphprotocol/graph-ts'
-import { Approval, Burn, Mint, Transfer } from '../../../../generated/ProtToken/DSToken'
-import { ERC20Transfer } from '../../../../generated/schema'
+import { Approval, Burn, Mint, Transfer } from '../../generated/ProtToken/DSToken'
+import { ERC20Transfer } from '../../generated/schema'
 import {
+  getOrCreateERC20,
   getOrCreateERC20Balance,
   getOrCreateERC20BAllowance,
   updateAllowance,
-} from '../../../entities/erc20'
+} from '../entities/erc20'
 
-import * as decimal from '../../../utils/decimal'
-import { eventUid, NULL_ADDRESS } from '../../../utils/ethereum'
+import * as decimal from '../utils/decimal'
+import { eventUid, NULL_ADDRESS } from '../utils/ethereum'
 
-const PROT_TOKEN_LABEL = 'PROT_TOKEN'
 export function handleTransfer(event: Transfer): void {
   let tokenAddress = dataSource.address()
 
@@ -21,13 +21,7 @@ export function handleTransfer(event: Transfer): void {
 
   // Check if it's not a burn before updating destination
   if (!destination.equals(nullAddress)) {
-    let destBalance = getOrCreateERC20Balance(
-      destination,
-      tokenAddress,
-      PROT_TOKEN_LABEL,
-      event,
-      true,
-    )
+    let destBalance = getOrCreateERC20Balance(destination, tokenAddress, event, true)
     destBalance.balance = destBalance.balance.plus(amount)
     destBalance.modifiedAt = event.block.timestamp
     destBalance.modifiedAtBlock = event.block.number
@@ -37,7 +31,7 @@ export function handleTransfer(event: Transfer): void {
 
   // Check if it's not a mint before updating source
   if (!source.equals(nullAddress)) {
-    let srcBalance = getOrCreateERC20Balance(source, tokenAddress, PROT_TOKEN_LABEL, event, true)
+    let srcBalance = getOrCreateERC20Balance(source, tokenAddress, event, true)
     srcBalance.balance = srcBalance.balance.minus(amount)
     srcBalance.modifiedAt = event.block.timestamp
     srcBalance.modifiedAtBlock = event.block.number
@@ -52,17 +46,16 @@ export function handleTransfer(event: Transfer): void {
   // funds) but it might not always be the case and therefore the allowance will be wrong. But it should work
   // in most cases.
 
-  updateAllowance(tokenAddress, destination, source, PROT_TOKEN_LABEL, event)
+  updateAllowance(tokenAddress, destination, source, event)
 
   // Sync these assuming msg.sender is the contract emitting the event or tx originator
-  updateAllowance(tokenAddress, event.address, source, PROT_TOKEN_LABEL, event)
+  updateAllowance(tokenAddress, event.address, source, event)
 
-  updateAllowance(tokenAddress, event.transaction.from, source, PROT_TOKEN_LABEL, event)
+  updateAllowance(tokenAddress, event.transaction.from, source, event)
 
   // Create a transfer object
   let transfer = new ERC20Transfer(eventUid(event))
   transfer.tokenAddress = tokenAddress
-  transfer.label = PROT_TOKEN_LABEL
   transfer.source = source
   transfer.destination = destination
   transfer.amount = amount
@@ -73,13 +66,7 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleMint(event: Mint): void {
-  let bal = getOrCreateERC20Balance(
-    event.params.guy,
-    dataSource.address(),
-    PROT_TOKEN_LABEL,
-    event,
-    true,
-  )
+  let bal = getOrCreateERC20Balance(event.params.guy, dataSource.address(), event, true)
   let amount = decimal.fromWad(event.params.wad)
   bal.balance = bal.balance.plus(amount)
   bal.save()
@@ -87,7 +74,6 @@ export function handleMint(event: Mint): void {
   // Create a transfer object from the NULL address
   let transfer = new ERC20Transfer(eventUid(event))
   transfer.tokenAddress = dataSource.address()
-  transfer.label = PROT_TOKEN_LABEL
   transfer.source = NULL_ADDRESS as Bytes
   transfer.destination = event.params.guy
   transfer.amount = amount
@@ -95,14 +81,18 @@ export function handleMint(event: Mint): void {
   transfer.createdAtBlock = event.block.number
   transfer.createdAtTransaction = event.transaction.hash
   transfer.save()
+
+  let erc20 = getOrCreateERC20(dataSource.address())
+  erc20.totalSupply = erc20.totalSupply.plus(amount)
+  erc20.save()
 }
 
 export function handleBurn(event: Burn): void {
   let tokenAddress = dataSource.address()
-  let bal = getOrCreateERC20Balance(event.params.guy, tokenAddress, PROT_TOKEN_LABEL, event, true)
+  let bal = getOrCreateERC20Balance(event.params.guy, tokenAddress, event, true)
 
   // Sync these assuming msg.sender is the contract emitting the event or tx originator
-  updateAllowance(tokenAddress, event.transaction.from, event.params.guy, PROT_TOKEN_LABEL, event)
+  updateAllowance(tokenAddress, event.transaction.from, event.params.guy, event)
 
   let amount = decimal.fromWad(event.params.wad)
   bal.balance = bal.balance.minus(amount)
@@ -111,7 +101,6 @@ export function handleBurn(event: Burn): void {
   // Create a transfer object to the NULL address
   let transfer = new ERC20Transfer(eventUid(event))
   transfer.tokenAddress = tokenAddress
-  transfer.label = PROT_TOKEN_LABEL
   transfer.source = event.params.guy
   transfer.destination = NULL_ADDRESS as Bytes
   transfer.amount = amount
@@ -119,6 +108,10 @@ export function handleBurn(event: Burn): void {
   transfer.createdAtBlock = event.block.number
   transfer.createdAtTransaction = event.transaction.hash
   transfer.save()
+
+  let erc20 = getOrCreateERC20(dataSource.address())
+  erc20.totalSupply = erc20.totalSupply.minus(amount)
+  erc20.save()
 }
 
 export function handleApproval(event: Approval): void {
@@ -127,7 +120,6 @@ export function handleApproval(event: Approval): void {
     event.params.src,
     tokenAddress,
     event.params.guy,
-    PROT_TOKEN_LABEL,
     event,
   )
   allowance.amount = decimal.fromWad(event.params.wad)

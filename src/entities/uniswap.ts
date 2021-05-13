@@ -1,20 +1,18 @@
-import { UniswapPair as UniswapPairEntity } from './'
-import { UniswapV2Pair as UniswapPairContract } from '../../generated/UniCoinPool/UniswapV2Pair'
+import { UniswapV2Pair as UniswapV2PairEntity } from './../../generated/schema'
+import { UniswapV2Pair as UniswapV2PairContract } from '../../generated/UniCoinPool/UniswapV2Pair'
 import * as decimal from '../utils/decimal'
 import { Address, ethereum } from '@graphprotocol/graph-ts'
 
 export function getOrCreateUniPool(
   pairAddress: Address,
   event: ethereum.Event,
-  name?: string,
-): UniswapPairEntity {
-  let pair = UniswapPairEntity.load(pairAddress.toHexString())
+): UniswapV2PairEntity {
+  let pair = UniswapV2PairEntity.load(pairAddress.toHexString())
   if (pair == null) {
     // Create a new pair entity
-    pair = new UniswapPairEntity(pairAddress.toHexString())
-    let pairContract = UniswapPairContract.bind(pairAddress)
+    pair = new UniswapV2PairEntity(pairAddress.toHexString())
+    let pairContract = UniswapV2PairContract.bind(pairAddress)
 
-    pair.label = name
     pair.address = pairAddress
 
     pair.token0 = pairContract.token0()
@@ -41,5 +39,5 @@ export function getOrCreateUniPool(
     pair.save()
   }
 
-  return pair as UniswapPairEntity
+  return pair as UniswapV2PairEntity
 }
