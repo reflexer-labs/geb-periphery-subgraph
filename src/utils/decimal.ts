@@ -12,18 +12,17 @@ let RAY_PRECISION = <u8>27
 // @ts-ignore
 let RAD_PRECISION = <u8>45
 
-let WAD = BigInt.fromI32(10).pow(WAD_PRECISION).toBigDecimal()
+let WAD = BigInt.fromI32(10)
+  .pow(WAD_PRECISION)
+  .toBigDecimal()
 
-let RAY = BigInt.fromI32(10).pow(RAY_PRECISION).toBigDecimal()
+let RAY = BigInt.fromI32(10)
+  .pow(RAY_PRECISION)
+  .toBigDecimal()
 
-let RAD = BigInt.fromI32(10).pow(RAD_PRECISION).toBigDecimal()
-
-// TODO
-// let SECONDS_IN_YEAR = <u8>(60 * 60 * 24 * 365)
-//
-// let RAY_APY = BigInt.fromI32(10)
-//   .pow(RAY_PRECISION * SECONDS_IN_YEAR)
-//   .toBigDecimal()
+let RAD = BigInt.fromI32(10)
+  .pow(RAD_PRECISION)
+  .toBigDecimal()
 
 export function fromNumber(n: number): BigDecimal {
   return BigDecimal.fromString(n.toString())
@@ -36,14 +35,6 @@ export function fromRad(value: BigInt): BigDecimal {
 export function fromRay(value: BigInt): BigDecimal {
   return value.divDecimal(RAY)
 }
-
-// TODO
-// export function fromRayApy(value: BigInt): BigDecimal {
-//   return value
-//     .pow(SECONDS_IN_YEAR)
-//     .divDecimal(RAY_APY)
-//     .minus(ONE)
-// }
 
 export function fromWad(value: BigInt): BigDecimal {
   return value.divDecimal(WAD)
