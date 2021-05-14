@@ -104,7 +104,7 @@ dataSources:
     network: mainnet
     source:
       abi: UniswapV2Pair
-      address: '0x03ab458634910aad20ef5f1c8ee96f1d6ac54919'
+      address: '0x4a0ea6ad985f6526de7d1ade562e1007e9c5d757'
       startBlock: 11848304
     mapping:
       kind: ethereum/events
