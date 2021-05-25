@@ -133,7 +133,7 @@ dataSources:
         # - event: Burn(indexed address,uint256,uint256,indexed address)
         #   handler: handleBurn
 
-  - name: RAIETHSavior
+  - name: CoinNativeSavior
     kind: ethereum/contract
     network: mainnet
     source:
@@ -144,7 +144,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/uniswap-v2.ts
+      file: ./src/mappings/savior-uniswap-lp.ts
       entities:
         - SaviorBalance
         - SaviorBalanceChange

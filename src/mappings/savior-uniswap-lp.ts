@@ -3,7 +3,7 @@ import {
   Deposit,
   SaveSAFE,
   Withdraw,
-} from '../../generated/RAIETHSavior/NativeUnderlyingUniswapV2SafeSaviour'
+} from '../../generated/CoinNativeSavior/NativeUnderlyingUniswapV2SafeSaviour'
 
 import { SaviorBalance, SaviorBalanceChange } from '../../generated/schema'
 
@@ -42,7 +42,11 @@ export function handleWithdraw(event: Withdraw): void {
   change.save()
 }
 
-function getOrCreateSaviorBalance(savior: Address, safeHandler: Address, event: ethereum.Event) {
+function getOrCreateSaviorBalance(
+  savior: Address,
+  safeHandler: Address,
+  event: ethereum.Event,
+): SaviorBalance {
   let id = saviorId(savior, safeHandler)
   let balance = SaviorBalance.load(id)
   if (balance == null) {
@@ -63,7 +67,7 @@ function getOrCreateSaviorBalanceChange(
   savior: Address,
   safeHandler: Address,
   event: ethereum.Event,
-) {
+): SaviorBalanceChange {
   let id = saviorId(savior, safeHandler)
   let change = SaviorBalanceChange.load(id)
   if (change == null) {
