@@ -203,3 +203,51 @@ type UniswapV2Sync @entity {
   " Hash of the transaction that executed the sync "
   createdAtTransaction: Bytes!
 }
+
+# --- Saviors ---
+
+type SaviorBalance @entity {
+  "<saviorAddress>-<safeHandler> "
+  id: ID!
+
+  " Smart contract address of the savior "
+  saviorAddress: Bytes!
+
+  " balance owner "
+  address: Bytes!
+
+  " savior balance in the contract "
+  balance: BigDecimal!
+
+  " Timestamp of the block at which the sync was made [unix time] "
+  createdAt: BigInt!
+
+  " Block number at which the sync was made "
+  createdAtBlock: BigInt!
+
+  " Hash of the transaction that executed the sync "
+  createdAtTransaction: Bytes!
+}
+
+type SaviorBalanceChange @entity {
+  "<saviorAddress>-<safeHandler> "
+  id: ID!
+
+  " Smart contract address of the savior "
+  saviorAddress: Bytes!
+
+  " balance owner "
+  address: Bytes!
+
+  " savior balance in the contract "
+  deltaBalance: BigDecimal!
+
+  " Timestamp of the block at which the sync was made [unix time] "
+  createdAt: BigInt!
+
+  " Block number at which the sync was made "
+  createdAtBlock: BigInt!
+
+  " Hash of the transaction that executed the sync "
+  createdAtTransaction: Bytes!
+}
