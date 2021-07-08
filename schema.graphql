@@ -230,7 +230,7 @@ type SaviorBalance @entity {
 }
 
 type SaviorBalanceChange @entity {
-  "<saviorAddress>-<safeHandler> "
+  "<tx hash>-<log index> "
   id: ID!
 
   " Smart contract address of the savior "
