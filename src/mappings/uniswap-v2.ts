@@ -97,7 +97,7 @@ export function handleTransfer(event: Transfer): void {
       source,
       tokenAddress,
       event,
-      false,
+      true,
     )
     srcBalance.balance = srcBalance.balance.minus(amount)
     srcBalance.modifiedAt = event.block.timestamp
