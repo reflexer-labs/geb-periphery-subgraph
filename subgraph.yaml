@@ -173,3 +173,45 @@ dataSources:
         #   handler: handleModifyParameters
         # - event: RemoveAuthorization(address)
         #   handler: handleRemoveAuthorization
+
+  - name: RecyclingSurplusAuctionHouse
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: RecyclingSurplusAuctionHouse
+      address: '0xAe402576187cc68098F74E14253c9816346eb932'
+      startBlock: 13081946
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/recycling-auction.ts
+      entities:
+        - EnglishAuction
+        - EnglishAuctionBid
+      abis:
+        - name: RecyclingSurplusAuctionHouse
+          file: ./abis/RecyclingSurplusAuctionHouse.json
+      eventHandlers:
+        - event: AddAuthorization(address)
+          handler: handleAddAuthorization
+        - event: ModifyParameters(bytes32,uint256)
+          handler: handleModifyParameters
+        - event: ModifyParameters(bytes32,address)
+          handler: handleModifyParameters
+        - event: StartAuction(indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleStartAuction
+        - event: IncreaseBidSize(uint256,address,uint256,uint256,uint256)
+          handler: handleIncreaseBidSize
+        - event: RestartAuction(uint256,uint256)
+          handler: handleRestartAuction
+        - event: SettleAuction(indexed uint256)
+          handler: handleSettleAuction
+        # - event: RemoveAuthorization(address)
+        #   handler: handleRemoveAuthorization
+
+        # Remaining events:
+        # - event: DisableContract()
+        #   handler: handleDisableContract
+        # - event: TerminateAuctionPrematurely(uint256,address,address,uint256)
+        #   handler: handleTerminateAuctionPrematurely
